@@ -93,8 +93,6 @@ Dancer2::Plugin::CryptPassphrase - use Crypt::Passphrase with Dancer2
 
 This plugin integrates L<Crypt::Passphrase> with your L<Dancer2> app,
 
-See L<Prometheus::Tiny> for more details of the kind of metrics supported.
-
 =head1 KEYWORDS
 
 =head2 crypt_passphrase
