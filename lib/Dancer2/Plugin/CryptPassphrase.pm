@@ -48,8 +48,14 @@ has crypt_passphrase => (
     },
 );
 
-plugin_keywords
-  qw/ crypt_passphrase hash_password verify_password password_needs_rehash /;
+plugin_keywords qw(
+  crypt_passphrase
+  hash_password
+  password_needs_rehash
+  verify_password
+);
+
+1;
 
 =head1 NAME
 
@@ -66,14 +72,20 @@ Dancer2::Plugin::CryptPassphrase - use Crypt::Passphrase with Dancer2
         my $password = body_parameters->get('password');
         my $hash     = my_get_hash_function($username);
 
-        if ( verify_password($password, $hash) ) {
+        if ( verify_password( $password, $hash ) ) {
             # login success
 
-            if ( password_needs_rehash($hash) {
+            if ( password_needs_rehash($hash) ) {
+                # upgrade hash in storage
                 my_update_hash_function( $username, hash_password($pasword) );
             }
+
+            # ... do stuff
+        }
         else {
             # login failed
+
+            # ... do stuff
         }
     };
 
@@ -95,19 +107,19 @@ Returns a new hash for the given C<$password>.
 
 See also L<Crypt::Password/hash_password>.
 
-=head2 verify_password $password, $hash
-
-Returns a true value if the C<$password> matches the given C<$hash>,
-otherwise returns a false value.
-
-See also L<Crypt::Password/verify_password>.
-
 =head2 password_needs_rehash $hash
 
 Returns a true value if C<$hash> should be upgraded to use the current
 L</encoder>.
 
 See also L<Crypt::Password/needs_rehash>.
+
+=head2 verify_password $password, $hash
+
+Returns a true value if the C<$password> matches the given C<$hash>,
+otherwise returns a false value.
+
+See also L<Crypt::Password/verify_password>.
 
 =head1 CONFIGURATION
 
@@ -119,7 +131,7 @@ Example:
           module: Argon2
           parallelism: 2
         validators:
-          - +My::Validator::Class
+          - +My::Old::Passphrase::Module
           - Bcrypt
 
 Configuration options are used as the arguments for L<Crypt::Passphrase/new>,
@@ -127,7 +139,7 @@ as follows:
 
 =head2 encoder
 
-Default: C<Argon2>
+Default: C<Argon2> with defaults from L<Crypt::Passphrase::Argon2>.
 
 This can be one of two different things:
 
@@ -147,6 +159,11 @@ The C<module> entry will be used to load a new L<Crypt::Passphrase> module as
 described above, the other arguments will be passed to the constructor. This
 is the recommended option, as it gives you full control over the password
 parameters.
+
+=back
+
+B<NOTE:> If you wish to use an encoder other than C<Argon2>, then you
+need to install the appropriate C<Crypt::Passphrase::> module.
 
 =head2 validators
 
